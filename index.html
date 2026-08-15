@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>驾考通 · 科目一/二/三 视频教学与模拟考试</title>
+<style>
+:root{
+  --primary:#1a73e8;--primary-dark:#1557b0;--primary-light:#e8f0fe;
+  --accent:#00b894;--warning:#fdcb6e;--danger:#e74c3c;
+  --bg:#f0f2f5;--card:#fff;--text:#1a1a2e;--text-light:#6b7280;
+  --border:#e5e7eb;--radius:14px;--shadow:0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+.hidden{display:none!important}
+
+/* ===== 顶部导航 ===== */
+header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);box-shadow:var(--shadow);padding-top:env(safe-area-inset-top)}
+.nav{max-width:1100px;margin:0 auto;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--primary)}
+.brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#4facfe);
+  display:grid;place-items:center;color:#fff;font-size:18px;font-weight:900}
+.nav-links{display:flex;gap:6px;align-items:center}
+.nav-links a{padding:8px 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--text-light);transition:.2s}
+.nav-links a:hover{background:var(--primary-light);color:var(--primary)}
+.nav-links a.active{background:var(--primary);color:#fff}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:8px}
+.hamburger span{width:24px;height:3px;background:var(--text);border-radius:3px;transition:.3s}
+
+/* ===== Hero ===== */
+.hero{padding:48px 16px 36px;text-align:center;background:linear-gradient(160deg,#1a73e8 0%,#4facfe 100%);color:#fff}
+.hero h1{font-size:34px;font-weight:900;margin-bottom:10px;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hero p{font-size:17px;opacity:.95;max-width:560px;margin:0 auto}
+.hero .stats{display:flex;justify-content:center;gap:30px;margin-top:24px;flex-wrap:wrap}
+.hero .stat{min-width:90px}
+.hero .stat b{display:block;font-size:26px;font-weight:900}
+.hero .stat span{font-size:13px;opacity:.85}
+
+/* ===== 科目卡片 ===== */
+.section{padding:40px 0}
+.section-title{font-size:24px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.section-sub{color:var(--text-light);margin-bottom:24px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+  cursor:pointer;transition:.25s;border:1px solid transparent}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary-light)}
+.card .top{height:120px;display:grid;place-items:center;color:#fff;position:relative}
+.card .top .num{font-size:48px;font-weight:900;opacity:.9}
+.card.s1 .top{background:linear-gradient(135deg,#1a73e8,#4facfe)}
+.card.s2 .top{background:linear-gradient(135deg,#00b894,#00cec9)}
+.card.s3 .top{background:linear-gradient(135deg,#fd79a8,#e84393)}
+.card .body{padding:18px}
+.card .body h3{font-size:19px;margin-bottom:6px}
+.card .body p{font-size:14px;color:var(--text-light);margin-bottom:12px}
+.card .meta{display:flex;gap:14px;font-size:13px;color:var(--text-light)}
+.card .meta span{display:flex;align-items:center;gap:4px}
+
+/* ===== 内容区 ===== */
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);
+  padding:8px 16px;border-radius:9px;font-weight:600;cursor:pointer;margin-bottom:20px;transition:.2s}
+.back-btn:hover{background:var(--primary-light);color:var(--primary)}
+.subject-header{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.subject-header .badge{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;color:#fff;font-size:30px;font-weight:900}
+.subject-header.s1 .badge{background:linear-gradient(135deg,#1a73e8,#4facfe)}
+.subject-header.s2 .badge{background:linear-gradient(135deg,#00b894,#00cec9)}
+.subject-header.s3 .badge{background:linear-gradient(135deg,#fd79a8,#e84393)}
+.subject-header h2{font-size:26px}
+.subject-header p{color:var(--text-light)}
+
+/* ===== 视频列表 ===== */
+.block-title{font-size:20px;font-weight:800;margin:30px 0 16px;display:flex;align-items:center;gap:8px}
+.block-title::before{content:"";width:5px;height:20px;border-radius:3px;background:var(--primary)}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.video-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:.25s}
+.video-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.video-thumb{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#2c3e50,#3498db);
+  display:grid;place-items:center;cursor:pointer}
+.video-thumb .play{width:56px;height:56px;background:rgba(255,255,255,.92);border-radius:50%;
+  display:grid;place-items:center;color:var(--primary);font-size:24px;transition:.2s}
+.video-thumb:hover .play{transform:scale(1.12);background:#fff}
+.video-thumb .dur{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;
+  font-size:12px;padding:2px 8px;border-radius:6px}
+.video-thumb .tag{position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;
+  font-size:12px;padding:2px 8px;border-radius:6px;font-weight:600}
+.video-info{padding:14px}
+.video-info h4{font-size:16px;margin-bottom:4px;line-height:1.4}
+.video-info p{font-size:13px;color:var(--text-light)}
+.video-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:grid;place-items:center;padding:20px}
+.video-modal .box{width:100%;max-width:820px}
+.video-modal .player{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}
+.video-modal .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-modal .vlink{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);text-align:center;padding:6px}
+.video-modal .vlink a{color:#fff;font-size:13px}
+.video-modal .close{position:absolute;top:20px;right:24px;color:#fff;font-size:32px;cursor:pointer;background:none;border:0}
+
+/* ===== 考试区 ===== */
+.exam-toolbar{display:flex;align-items:center;justify-content:space-between;background:var(--card);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.exam-toolbar .info{display:flex;gap:20px;font-size:14px;color:var(--text-light)}
+.exam-toolbar .info b{color:var(--primary);font-size:20px}
+.btn{background:var(--primary);color:#fff;border:0;padding:11px 24px;border-radius:10px;font-weight:700;
+  font-size:15px;cursor:pointer;transition:.2s;font-family:inherit}
+.btn:hover{background:var(--primary-dark)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:var(--primary-light);color:var(--primary)}
+.btn.ghost:hover{background:#d4e4fd}
+
+.progress-wrap{height:8px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:20px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--primary),#4facfe);border-radius:5px;transition:.3s;width:0}
+
+.question-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;margin-bottom:18px}
+.q-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.q-type{font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;background:var(--primary-light);color:var(--primary);white-space:nowrap}
+.q-num{font-size:13px;color:var(--text-light);margin-bottom:14px}
+.q-text{font-size:18px;font-weight:600;margin-bottom:20px;line-height:1.6}
+.options{display:flex;flex-direction:column;gap:12px}
+.option{display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid var(--border);
+  border-radius:11px;cursor:pointer;transition:.18s;font-size:16px}
+.option:hover{border-color:var(--primary);background:var(--primary-light)}
+.option .opt-key{width:30px;height:30px;flex-shrink:0;border-radius:8px;background:#f1f3f5;display:grid;place-items:center;font-weight:800;color:var(--text-light)}
+.option.selected{border-color:var(--primary);background:var(--primary-light)}
+.option.selected .opt-key{background:var(--primary);color:#fff}
+.option.correct{border-color:var(--accent);background:#e6fbf2}
+.option.correct .opt-key{background:var(--accent);color:#fff}
+.option.wrong{border-color:var(--danger);background:#fdecea}
+.option.wrong .opt-key{background:var(--danger);color:#fff}
+.option.locked{cursor:default}
+.explain{margin-top:18px;padding:16px;background:#f8f9fa;border-left:4px solid var(--warning);border-radius:8px;font-size:14px;line-height:1.7}
+.explain b{color:var(--warning)}
+
+.exam-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* 成绩 */
+.result{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:40px;text-align:center;max-width:480px;margin:30px auto}
+.result .score-circle{width:140px;height:140px;border-radius:50%;margin:0 auto 20px;display:grid;place-items:center;
+  font-size:44px;font-weight:900;color:#fff;background:conic-gradient(var(--accent) var(--deg,0deg),#eee 0deg)}
+.result h2{font-size:26px;margin-bottom:8px}
+.result .detail{color:var(--text-light);margin-bottom:24px}
+.result .row{display:flex;justify-content:space-around;margin-bottom:24px}
+.result .row div b{font-size:24px;display:block}
+.result .row .ok b{color:var(--accent)}
+.result .row .no b{color:var(--danger)}
+
+/* ===== 页脚 ===== */
+footer{background:#1a1a2e;color:#bbb;text-align:center;padding:30px 16px;padding-bottom:calc(30px + env(safe-area-inset-bottom));margin-top:40px;font-size:14px}
+footer .links{display:flex;justify-content:center;gap:20px;margin-bottom:10px;flex-wrap:wrap}
+footer a:hover{color:#fff}
+
+/* ===== 移动端适配 ===== */
+html,body{max-width:100%;overflow-x:hidden}
+a,button,.btn,.option,.card,.video-thumb,.back-btn,.hamburger{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+@media(max-width:880px){
+  .cards{grid-template-columns:1fr}
+  .hero{padding:36px 16px 28px}
+  .hero h1{font-size:26px;line-height:1.3}
+  .hero p{font-size:15px}
+  .hero .stats{gap:18px;margin-top:20px}
+  .hero .stat b{font-size:22px}
+  .nav-links{position:fixed;top:calc(60px + env(safe-area-inset-top));left:0;right:0;background:#fff;flex-direction:column;padding:10px 16px;
+    box-shadow:var(--shadow-lg);transform:translateY(-130%);transition:.3s;gap:2px;max-height:calc(100vh - 60px);overflow-y:auto}
+  .nav-links.open{transform:translateY(0)}
+  .nav-links a{width:100%;text-align:center;padding:14px;font-size:16px}
+  .hamburger{display:flex}
+  .video-grid{grid-template-columns:1fr}
+  .exam-toolbar{flex-direction:column;align-items:stretch;gap:14px}
+  .exam-toolbar .info{justify-content:space-around;flex-wrap:wrap;gap:10px}
+  .exam-toolbar .btn{width:100%}
+  .question-card{padding:18px}
+  .q-text{font-size:17px}
+  .options{gap:10px}
+  .option{padding:14px;font-size:16px}
+  .subject-header{gap:12px}
+  .subject-header .badge{width:54px;height:54px;font-size:26px;border-radius:14px}
+  .subject-header h2{font-size:22px}
+  .block-title{font-size:18px}
+  .result{padding:28px 20px;margin:20px auto}
+  .result .score-circle{width:120px;height:120px;font-size:38px}
+  .video-modal{padding:12px}
+  .video-modal .box{max-width:100%}
+  .video-modal .close{top:14px;right:14px;font-size:30px}
+  .section{padding:28px 0}
+  .section-title{font-size:21px}
+}
+@media(max-width:480px){
+  .hero h1{font-size:22px}
+  .subject-header{flex-direction:column;text-align:center;align-items:flex-start}
+  .hero .stat{min-width:70px}
+  .container{padding:0 14px}
+  .nav{padding:0 14px}
+  .card .top{height:100px}
+  .card .top .num{font-size:40px}
+  .exam-foot{flex-direction:column}
+  .exam-foot .btn{width:100%}
+}
+@media(max-width:380px){
+  .hero h1{font-size:20px}
+  .hero .stats{gap:12px}
+  .hero .stat b{font-size:20px}
+  .exam-toolbar .info{font-size:13px;gap:8px}
+  .option{font-size:15px;padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<header>
+  <nav class="nav">
+    <a href="#" class="brand" onclick="showPage('home')">
+      <span class="logo">驾</span> 驾考通
+    </a>
+    <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="#" class="active" onclick="showPage('home');setActive(this)">首页</a>
+      <a href="#" onclick="showPage('s1');setActive(this)">科目一</a>
+      <a href="#" onclick="showPage('s2');setActive(this)">科目二</a>
+      <a href="#" onclick="showPage('s3');setActive(this)">科目三</a>
+    </div>
+  </nav>
+</header>
+
+<!-- 首页 -->
+<section id="page-home">
+  <div class="hero">
+    <h1>🚗 驾考通 · 视频教学 + 模拟考试</h1>
+    <p>科目一理论、科目二场地、科目三路考，视频教程与海量题库一站式备考，手机电脑都能学。</p>
+    <div class="stats">
+      <div class="stat"><b>3</b><span>考试科目</span></div>
+      <div class="stat"><b>15+</b><span>视频教程</span></div>
+      <div class="stat"><b>45+</b><span>模拟大题</span></div>
+      <div class="stat"><b>100%</b><span>免费学习</span></div>
+    </div>
+  </div>
+
+  <div class="container section">
+    <div class="section-title">📚 选择考试科目</div>
+    <div class="section-sub">点击卡片进入对应科目的视频教程与模拟考试</div>
+    <div class="cards">
+      <div class="card s1" onclick="showPage('s1')">
+        <div class="top"><span class="num">一</span></div>
+        <div class="body">
+          <h3>科目一 · 理论考试</h3>
+          <p>交通法规、交通标志、安全文明驾驶常识，电脑机考100题。</p>
+          <div class="meta"><span>🎬 5 个视频</span><span>📝 15 道大题</span></div>
+        </div>
+      </div>
+      <div class="card s2" onclick="showPage('s2')">
+        <div class="top"><span class="num">二</span></div>
+        <div class="body">
+          <h3>科目二 · 场地驾驶</h3>
+          <p>倒车入库、侧方停车、坡道定点、曲线行驶、直角转弯五项必考。</p>
+          <div class="meta"><span>🎬 5 个视频</span><span>📝 15 道大题</span></div>
+        </div>
+      </div>
+      <div class="card s3" onclick="showPage('s3')">
+        <div class="top"><span class="num">三</span></div>
+        <div class="body">
+          <h3>科目三 · 道路驾驶</h3>
+          <p>上车准备、灯光模拟、路考16项，实际道路安全驾驶技能考核。</p>
+          <div class="meta"><span>🎬 5 个视频</span><span>📝 15 道大题</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 科目一 -->
+<section id="page-s1" class="hidden">
+  <div class="container section">
+    <button class="back-btn" onclick="showPage('home')">← 返回首页</button>
+    <div class="subject-header s1">
+      <div class="badge">一</div>
+      <div><h2>科目一 · 理论考试</h2><p>交通法规基础、交通信号、安全行车与文明驾驶</p></div>
+    </div>
+
+    <div class="block-title">🎬 视频教程</div>
+    <div class="video-grid" id="videos-s1"></div>
+
+    <div class="block-title">📝 模拟大题</div>
+    <div class="exam-toolbar">
+      <div class="info">
+        <span>共 <b id="cnt-s1">15</b> 题</span>
+        <span>答对 <b id="right-s1">0</b></span>
+        <span>答错 <b id="wrong-s1">0</b></span>
+      </div>
+      <button class="btn" id="start-s1" onclick="startExam('s1')">开始考试</button>
+    </div>
+    <div class="progress-wrap hidden" id="prog-wrap-s1"><div class="progress-bar" id="prog-s1"></div></div>
+    <div id="exam-s1"></div>
+  </div>
+</section>
+
+<!-- 科目二 -->
+<section id="page-s2" class="hidden">
+  <div class="container section">
+    <button class="back-btn" onclick="showPage('home')">← 返回首页</button>
+    <div class="subject-header s2">
+      <div class="badge">二</div>
+      <div><h2>科目二 · 场地驾驶</h2><p>倒车入库、侧方停车、坡道定点停车与起步、曲线行驶、直角转弯</p></div>
+    </div>
+
+    <div class="block-title">🎬 视频教程</div>
+    <div class="video-grid" id="videos-s2"></div>
+
+    <div class="block-title">📝 模拟大题</div>
+    <div class="exam-toolbar">
+      <div class="info">
+        <span>共 <b id="cnt-s2">15</b> 题</span>
+        <span>答对 <b id="right-s2">0</b></span>
+        <span>答错 <b id="wrong-s2">0</b></span>
+      </div>
+      <button class="btn" id="start-s2" onclick="startExam('s2')">开始考试</button>
+    </div>
+    <div class="progress-wrap hidden" id="prog-wrap-s2"><div class="progress-bar" id="prog-s2"></div></div>
+    <div id="exam-s2"></div>
+  </div>
+</section>
+
+<!-- 科目三 -->
+<section id="page-s3" class="hidden">
+  <div class="container section">
+    <button class="back-btn" onclick="showPage('home')">← 返回首页</button>
+    <div class="subject-header s3">
+      <div class="badge">三</div>
+      <div><h2>科目三 · 道路驾驶</h2><p>上车准备、模拟灯光、起步、加减档、变道、靠边停车等16项</p></div>
+    </div>
+
+    <div class="block-title">🎬 视频教程</div>
+    <div class="video-grid" id="videos-s3"></div>
+
+    <div class="block-title">📝 模拟大题</div>
+    <div class="exam-toolbar">
+      <div class="info">
+        <span>共 <b id="cnt-s3">15</b> 题</span>
+        <span>答对 <b id="right-s3">0</b></span>
+        <span>答错 <b id="wrong-s3">0</b></span>
+      </div>
+      <button class="btn" id="start-s3" onclick="startExam('s3')">开始考试</button>
+    </div>
+    <div class="progress-wrap hidden" id="prog-wrap-s3"><div class="progress-bar" id="prog-s3"></div></div>
+    <div id="exam-s3"></div>
+  </div>
+</section>
+
+<!-- 视频弹窗 -->
+<div class="video-modal hidden" id="videoModal" onclick="if(event.target===this)closeVideo()">
+  <button class="close" onclick="closeVideo()">×</button>
+  <div class="box">
+    <div class="player" id="videoPlayer">▶ 视频播放区<br><small>（在此嵌入你的教学视频）</small></div>
+  </div>
+</div>
+
+<footer>
+  <div class="links">
+    <a href="#" onclick="showPage('home')">首页</a>
+    <a href="#" onclick="showPage('s1')">科目一</a>
+    <a href="#" onclick="showPage('s2')">科目二</a>
+    <a href="#" onclick="showPage('s3')">科目三</a>
+  </div>
+  <p>驾考通 · 视频教学与模拟考试平台 · 仅供学习交流使用</p>
+</footer>
+
+<script>
+/* ================= 数据 ================= */
+const VIDEOS = {
+  s1:[
+    {t:"科目一考试全流程与答题技巧",d:"约50分",tag:"必看",desc:"考试流程、题型分布与答题技巧总览",bvid:"BV1Lu411x7VZ",page:1},
+    {t:"交通标志全解析（指示/警告/禁令）",d:"约50分",tag:"重点",desc:"三大类交通标志速记口诀",bvid:"BV1Lu411x7VZ",page:2},
+    {t:"交通信号灯与交警手势",d:"约50分",tag:"重点",desc:"红绿灯、箭头灯及手势信号识别",bvid:"BV1Lu411x7VZ",page:3},
+    {t:"安全行车与文明驾驶常识",d:"约50分",tag:"高频",desc:"安全距离、让行规则与应急处置",bvid:"BV1Lu411x7VZ",page:4},
+    {t:"科目一易错题专项突破",d:"约50分",tag:"提分",desc:"历年高频易错考点精讲（璇姐精华课）",bvid:"BV1Lu411x7VZ",page:4},
+  ],
+  s2:[
+    {t:"科目二考试全流程与扣分标准",d:"12:22",tag:"必看",desc:"五项考试顺序与评判标准总览",bvid:"BV1ra4y1h7iA",page:1},
+    {t:"倒车入库技巧详解",d:"09:36",tag:"重点",desc:"看点打方向，一把入库不压线",bvid:"BV1ra4y1h7iA",page:5},
+    {t:"侧方停车一步到位",d:"07:43",tag:"重点",desc:"30cm边距与出库打灯要点",bvid:"BV1ra4y1h7iA",page:7},
+    {t:"坡道定点停车与起步",d:"09:15",tag:"难点",desc:"防溜车、准停线、平稳起步",bvid:"BV1ra4y1h7iA",page:8},
+    {t:"曲线行驶与直角转弯",d:"09:35",tag:"重点",desc:"看点走线，不压边缘线",bvid:"BV1ra4y1h7iA",page:10},
+  ],
+  s3:[
+    {t:"科目三全流程第一视角实车教学",d:"01:44",tag:"必看",desc:"C1科目三完整16项第一视角教学",bvid:"BV1LE41117HG",page:1},
+    {t:"考试项目与评判标准详解",d:"22:56",tag:"重点",desc:"各项目考试要求与扣分项说明",bvid:"BV1n4411G7Li",page:1},
+    {t:"上车准备与模拟灯光",d:"03:12",tag:"重点",desc:"绕车一周、灯光操作口诀与起步",bvid:"BV1Ff4y1f7Md",page:1},
+    {t:"全程模拟带语音提示",d:"11:56",tag:"难点",desc:"考试车模拟全程，熟悉语音播报",bvid:"BV1QE41197Ub",page:1},
+    {t:"考场路线实拍教学",d:"15:18",tag:"重点",desc:"真实考场路线第一视角跟拍",bvid:"BV1eHpkzmEVD",page:1},
+  ]
+};
+
+const QUESTIONS = {
+  s1:[
+    {type:"判断",q:"驾驶机动车在道路上违反交通安全法规的行为属于违法行为。",a:0,opts:["正确","错误"],e:"违反交通安全法规即属违法行为，而非仅违规。"},
+    {type:"单选",q:"红色八角形交通标志表示什么含义？",a:0,opts:["停车让行","减速让行","注意危险","禁止通行"],e:"红色八角形为停车让行标志，必须停车观察。"},
+    {type:"单选",q:"同车道行驶的机动车，前车正在左转弯、掉头、超车时，后车应当？",a:1,opts:["加速超越","不得超车","鸣喇叭催促","紧跟行驶"],e:"前车左转、掉头、超车时不得超车，以防事故。"},
+    {type:"判断",q:"黄灯亮时，已越过停止线的车辆可以继续通行。",a:0,opts:["正确","错误"],e:"黄灯亮时已越线的车辆可继续通行，未越线应停车。"},
+    {type:"单选",q:"机动车在高速公路上发生故障时，警告标志应设置在车后多少米以外？",a:2,opts:["50米","100米","150米","200米"],e:"高速故障警告标志应设在来车方向150米以外。"},
+    {type:"单选",q:"驾驶机动车在城市快速路上行驶，最低车速不得低于多少？",a:0,opts:["60公里/小时","40公里/小时","50公里/小时","30公里/小时"],e:"城市快速路最低车速一般为60公里/小时。"},
+    {type:"判断",q:"饮酒后驾驶机动车的，处暂扣六个月机动车驾驶证，并处罚款。",a:0,opts:["正确","错误"],e:"饮酒驾驶处暂扣6个月驾照并处罚款，属法律规定。"},
+    {type:"单选",q:"蓝色圆形交通标志通常表示什么？",a:0,opts:["指示标志","警告标志","禁令标志","指路标志"],e:"蓝底圆形多为指示标志，指示车辆、行人行进。"},
+    {type:"单选",q:"夜间会车应当在距相对方向来车多少米以外改用近光灯？",a:1,opts:["50米","150米","100米","200米"],e:"夜间会车150米外应切换近光灯，避免眩目。"},
+    {type:"判断",q:"伪造、变造或者使用伪造、变造的机动车号牌的，由公安机关交通管理部门予以收缴，扣留该机动车，并处拘留。",a:0,opts:["正确","错误"],e:"伪造号牌将被收缴、扣车并处罚款拘留。"},
+    {type:"单选",q:"机动车遇有前方车辆停车排队等候时，应当？",a:2,opts:["借道超车","穿插等候","依次排队","鸣喇叭催促"],e:"前方排队应依次排队，不得借道、穿插。"},
+    {type:"单选",q:"驾驶拼装的机动车上道路行驶的，公安机关交通管理部门应当？",a:1,opts:["罚款后放行","予以收缴、强制报废","暂扣驾照","拘留驾驶人"],e:"拼装车上路将被收缴并强制报废。"},
+    {type:"判断",q:"机动车驾驶人应当遵守道路交通安全法律、法规的规定，按照操作规范安全驾驶、文明驾驶。",a:0,opts:["正确","错误"],e:"安全文明驾驶是驾驶人法定义务。"},
+    {type:"单选",q:"在路口遇到黄灯闪烁时，车辆应当？",a:1,opts:["加速通过","减速瞭望、确认安全后通过","停车等待","倒车避让"],e:"黄灯闪烁提示路口警示，应减速瞭望确认安全通过。"},
+    {type:"单选",q:"机动车驾驶证被依法扣留期间，驾驶人能否驾驶机动车？",a:2,opts:["可以","视情况","不得驾驶","扣满12分才可以"],e:"驾照被扣留期间不得驾驶机动车。"},
+  ],
+  s2:[
+    {type:"判断",q:"科目二考试倒车入库时，车辆车身出线即判定不合格。",a:0,opts:["正确","错误"],e:"倒车入库车身任一部位出线即不合格。"},
+    {type:"单选",q:"倒车入库过程中，以下哪项操作最容易压线？",a:1,opts:["打方向过早","打方向过晚","车速过快","后视镜未调"],e:"打方向过晚会导致车尾扫线压角，是常见失分点。（注：打方向过早也常压线，二者皆需精准）"},
+    {type:"判断",q:"侧方停车出库时，应当提前开启左转向灯。",a:0,opts:["正确","错误"],e:"侧方停车出库需打左转向灯，提示后方来车。"},
+    {type:"单选",q:"坡道定点停车时，车辆停止后，车身距离路边缘线30cm以上、50cm以下，扣几分？",a:1,opts:["不扣分","扣10分","扣100分","扣5分"],e:"边距超30cm未超50cm扣10分；超50cm不合格。"},
+    {type:"判断",q:"曲线行驶时，车辆可以随时停车，不影响考试成绩。",a:1,opts:["正确","错误"],e:"中途停车在曲线行驶中一般判不合格（新规部分项目允许短暂停车但扣分）。"},
+    {type:"单选",q:"科目二五项考试的顺序一般不包括以下哪项？",a:2,opts:["倒车入库","侧方停车","红灯路口起步","直角转弯"],e:"科目二在封闭场地进行，无真实红绿灯路口起步项目。"},
+    {type:"判断",q:"直角转弯前，应提前开启转向灯。",a:0,opts:["正确","错误"],e:"直角转弯需提前打转向灯，部分考场强制要求。"},
+    {type:"单选",q:"倒车入库时控制车速的关键操作是？",a:0,opts:["离合器半联动稳抬","猛踩油门","一直踩刹车","挂空挡滑行"],e:"靠离合器半联动控制低速平稳，便于看点修正。"},
+    {type:"判断",q:"坡道起步时车辆后溜距离大于30cm，判定为不合格。",a:0,opts:["正确","错误"],e:"起步后溜超30cm（或触地）判不合格；小于则扣分。"},
+    {type:"单选",q:"侧方停车时，车身与库边线距离应控制在多少较为合适？",a:1,opts:["10cm以内","30cm左右","50cm以上","紧贴库线"],e:"保持约30cm边距最利于一次入库不压线。"},
+    {type:"判断",q:"科目二考试中，不系安全带直接起步判定不合格。",a:0,opts:["正确","错误"],e:"未系安全带起步直接不合格，属安全红线。"},
+    {type:"单选",q:"以下哪项不是科目二必考项目？",a:2,opts:["倒车入库","坡道定点","紧急刹车","曲线行驶"],e:"紧急刹车不在科目二五项必考之列。"},
+    {type:"判断",q:"考试过程中熄火一次，直接判定不合格。",a:1,opts:["正确","错误"],e:"熄火一般扣10分并可重新起步，非直接不合格（中途熄火禁反复）。"},
+    {type:"单选",q:"倒车入库从起点倒入库，再前进出库，整套动作通常要求？",a:0,opts:["一次倒入不压线","可多次调整","车轮可压线","不限时间"],e:"应一次倒入且车身不压线，超出时间也判不合格。"},
+    {type:"判断",q:"科目二满分100分，大型车90分合格，小型车80分合格。",a:1,opts:["正确","错误"],e:"小型车科目二合格线为80分，大型车为90分。"},
+  ],
+  s3:[
+    {type:"判断",q:"科目三上车前，应逆时针绕车一周检查车辆外观及周围环境。",a:0,opts:["正确","错误"],e:"上车前逆时针绕车一周是必做安全动作。"},
+    {type:"单选",q:"模拟灯光考试中，“夜间通过急弯、坡路”应使用？",a:1,opts:["近光灯","远近光灯交替","远光灯","示廓灯"],e:"通过急弯坡路需远近光交替示意来车。"},
+    {type:"判断",q:"起步前，应开启左转向灯，观察后视镜并回头观察盲区。",a:0,opts:["正确","错误"],e:"起步打左灯、观察后视镜及盲区是标准流程。"},
+    {type:"单选",q:"科目三路考中，变更车道时应当？",a:0,opts:["提前开启转向灯并不少于3秒","直接变道","鸣喇叭即可","加速变道"],e:"变道需提前打灯满3秒并观察确认安全。"},
+    {type:"判断",q:"夜间行车在没有路灯、照明不良的道路上，应使用远光灯。",a:0,opts:["正确","错误"],e:"照明不良路段可用远光，但会车150米外改近光。"},
+    {type:"单选",q:"靠边停车时，车身右侧距道路边缘线应不大于多少？",a:1,opts:["10cm","30cm","50cm","60cm"],e:"靠边停车车身距边线不大于30cm为合格要求。"},
+    {type:"判断",q:"通过人行横道、学校区域、公交站台时，应减速慢行，必要时停车让行。",a:0,opts:["正确","错误"],e:"这些区域必须减速瞭望，遇行人停车让行。"},
+    {type:"单选",q:"科目三“加减档操作”要求？",a:2,opts:["随意换挡","只加不減","档位与车速匹配、平顺","越快越好"],e:"加减档需档速匹配、操作平顺，不得低头看档。"},
+    {type:"判断",q:"行驶中低头看档位，属于评判扣分项。",a:0,opts:["正确","错误"],e:"低头看档影响安全，属扣分项（严重可不合格）。"},
+    {type:"单选",q:"超车时应从被超车辆的哪一侧超越？",a:0,opts:["左侧","右侧","随意","前方"],e:"我国实行右侧通行，超车须从左侧超越。"},
+    {type:"判断",q:"科目三全程车速不能低于该项目规定的最低车速，也不得长时间低速行驶。",a:0,opts:["正确","错误"],e:"路考有最低车速要求，长时间低速影响通行判不合格。"},
+    {type:"单选",q:"听到“请靠边停车”指令后，应在多少距离内完成停车？",a:1,opts:["随便","规定距离内（约150米）","立即停车","下一路口"],e:"靠边停车指令后须在规定距离内完成，否则不合格。"},
+    {type:"判断",q:"通过路口时，即使绿灯也可不减速直接冲过。",a:1,opts:["正确","错误"],e:"路口须减速瞭望，绿灯也防“鬼探头”，不得冲抢。"},
+    {type:"单选",q:"科目三满分100分，合格分数线为？",a:1,opts:["80分","90分","70分","100分"],e:"科目三（小车）合格线为90分。"},
+    {type:"判断",q:"考试结束下车前，应熄火、拉紧驻车制动器、观察安全后再开车门。",a:0,opts:["正确","错误"],e:"靠边停车后熄火、拉手刹、观察再开门是规范动作。"},
+  ]
+};
+
+/* ================= 渲染视频 ================= */
+function renderVideos(){
+  for(const s of ["s1","s2","s3"]){
+    const box=document.getElementById("videos-"+s);
+    box.innerHTML=VIDEOS[s].map((v,i)=>`
+      <div class="video-card">
+        <div class="video-thumb" onclick="openVideo('${s}',${i})">
+          <span class="tag">${v.tag}</span>
+          <div class="play">▶</div>
+          <span class="dur">${v.d}</span>
+        </div>
+        <div class="video-info">
+          <h4>${v.t}</h4>
+          <p>${v.desc}</p>
+        </div>
+      </div>`).join("");
+  }
+}
+
+function openVideo(s,i){
+  const v=VIDEOS[s][i];
+  const p=v.page||1;
+  const src=`https://player.bilibili.com/player.html?bvid=${v.bvid}&page=${p}&high_quality=1&danmaku=0&autoplay=0`;
+  const url=`https://www.bilibili.com/video/${v.bvid}?p=${p}`;
+  document.getElementById("videoPlayer").innerHTML=
+    `<iframe src="${src}" scrolling="no" frameborder="no" allowfullscreen="true"
+       style="width:100%;height:100%;border:0;border-radius:12px;display:block"></iframe>
+     <div class="vlink"><a href="${url}" target="_blank" rel="noopener">▶ 网页内无法播放？点此在 B 站观看「${v.t}」</a></div>`;
+  document.getElementById("videoModal").classList.remove("hidden");
+}
+function closeVideo(){document.getElementById("videoModal").classList.add("hidden");}
+
+/* ================= 考试逻辑 ================= */
+const state={};
+function startExam(s){
+  state[s]={idx:0,right:0,wrong:0,answered:false,sel:null};
+  document.getElementById("start-"+s).classList.add("hidden");
+  document.getElementById("prog-wrap-"+s).classList.remove("hidden");
+  renderQuestion(s);
+}
+function renderQuestion(s){
+  const st=state[s],qs=QUESTIONS[s],q=qs[st.idx];
+  st.answered=false;st.sel=null;
+  document.getElementById("right-"+s).textContent=st.right;
+  document.getElementById("wrong-"+s).textContent=st.wrong;
+  const pct=Math.round(st.idx/qs.length*100);
+  document.getElementById("prog-"+s).style.width=pct+"%";
+  const optsHtml=q.opts.map((o,k)=>`
+    <div class="option" data-k="${k}" onclick="choose('${s}',${k})">
+      <span class="opt-key">${String.fromCharCode(65+k)}</span><span>${o}</span>
+    </div>`).join("");
+  document.getElementById("exam-"+s).innerHTML=`
+    <div class="question-card">
+      <div class="q-head"><span class="q-type">${q.type}</span></div>
+      <div class="q-num">第 ${st.idx+1} / ${qs.length} 题</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="opts-${s}">${optsHtml}</div>
+      <div class="explain hidden" id="exp-${s}"></div>
+    </div>
+    <div class="exam-foot">
+      <button class="btn ghost" onclick="showPage('${s}')">退出考试</button>
+      <button class="btn" id="next-${s}" disabled onclick="nextQ('${s}')">
+        ${st.idx===qs.length-1?"查看成绩":"下一题 →"}</button>
+    </div>`;
+}
+function choose(s,k){
+  const st=state[s];if(st.answered)return;
+  st.sel=k;
+  document.querySelectorAll(`#opts-${s} .option`).forEach(el=>{
+    el.classList.toggle("selected",+el.dataset.k===k);
+  });
+  document.getElementById("next-"+s).disabled=false;
+}
+function nextQ(s){
+  const st=state[s],qs=QUESTIONS[s],q=qs[st.idx];
+  if(!st.answered){
+    st.answered=true;
+    const correct=q.a===st.sel;
+    if(correct)st.right++;else st.wrong++;
+    document.querySelectorAll(`#opts-${s} .option`).forEach(el=>{
+      const k=+el.dataset.k;el.classList.add("locked");
+      if(k===q.a)el.classList.add("correct");
+      if(k===st.sel&&!correct)el.classList.add("wrong");
+    });
+    const exp=document.getElementById("exp-"+s);
+    exp.innerHTML=`<b>解析：</b>${q.e}`;
+    exp.classList.remove("hidden");
+    document.getElementById("next-"+s).textContent=st.idx===qs.length-1?"查看成绩":"下一题 →";
+    document.getElementById("right-"+s).textContent=st.right;
+    document.getElementById("wrong-"+s).textContent=st.wrong;
+    return;
+  }
+  st.idx++;
+  if(st.idx>=qs.length){showResult(s);}
+  else renderQuestion(s);
+}
+function showResult(s){
+  const st=state[s],qs=QUESTIONS[s],score=Math.round(st.right/qs.length*100);
+  document.getElementById("prog-"+s).style.width="100%";
+  const deg=score*3.6;
+  const passed=score>=80;
+  document.getElementById("exam-"+s).innerHTML=`
+    <div class="result">
+      <div class="score-circle" style="--deg:${deg}deg;background:conic-gradient(${passed?'var(--accent)':'var(--danger)'} ${deg}deg,#eee 0deg)">${score}</div>
+      <h2>${passed?'🎉 恭喜，合格！':'💪 继续加油！'}</h2>
+      <p class="detail">${passed?'你已掌握本科目重点，保持手感即可。':'未达合格线（80分），再看一遍视频巩固吧。'}</p>
+      <div class="row">
+        <div class="ok"><b>${st.right}</b>答对</div>
+        <div class="no"><b>${st.wrong}</b>答错</div>
+        <div><b>${qs.length}</b>总题</div>
+      </div>
+      <button class="btn" onclick="restart('${s}')">重新考试</button>
+    </div>`;
+}
+function restart(s){
+  document.getElementById("exam-"+s).innerHTML="";
+  document.getElementById("start-"+s).classList.remove("hidden");
+  document.getElementById("prog-wrap-"+s).classList.add("hidden");
+  document.getElementById("right-"+s).textContent="0";
+  document.getElementById("wrong-"+s).textContent="0";
+}
+
+/* ================= 导航 ================= */
+function showPage(p){
+  ["home","s1","s2","s3"].forEach(id=>{
+    document.getElementById("page-"+id).classList.toggle("hidden",id!==p);
+  });
+  document.getElementById("navLinks").classList.remove("open");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function setActive(el){
+  document.querySelectorAll(".nav-links a").forEach(a=>a.classList.remove("active"));
+  el.classList.add("active");
+}
+function toggleMenu(){document.getElementById("navLinks").classList.toggle("open");}
+
+/* ================= 初始化 ================= */
+renderVideos();
+for(const s of ["s1","s2","s3"])document.getElementById("cnt-"+s).textContent=QUESTIONS[s].length;
+</script>
+</body>
+</html>
